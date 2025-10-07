@@ -7,6 +7,7 @@ class m251007_194235_invoice extends CDbMigration
 		$this->createTable('invoice', array(
 			'id' => 'pk',
 			'number' => 'varchar(50) NOT NULL UNIQUE',
+			'internal_number' => 'varchar(50) NOT NULL UNIQUE',
 			'date' => 'date NOT NULL',
 			'status' => "enum('draft','closed') NOT NULL DEFAULT 'draft'",
 			'total_net' => 'decimal(14,4) DEFAULT 0.0000',
