@@ -7,6 +7,7 @@ class m251007_193937_item extends CDbMigration
 		$this->createTable('item', array(
 			'id' => 'pk',
 			'name' => 'string NOT NULL',
+			'sku' => 'string(100) DEFAULT NULL',
 			'unit' => 'string(50) NOT NULL',
 			'price' => 'decimal(12,4) NOT NULL DEFAULT 0.0000',
 			'vat_percent' => 'decimal(5,4) NOT NULL DEFAULT 25.0000',
