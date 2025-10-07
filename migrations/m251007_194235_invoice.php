@@ -8,6 +8,8 @@ class m251007_194235_invoice extends CDbMigration
 			'id' => 'pk',
 			'number' => 'varchar(50) NOT NULL UNIQUE',
 			'internal_number' => 'varchar(50) NOT NULL UNIQUE',
+			'payment_method' => 'text NULL', // e.g. "Transakcija", "kreditna kartica", "gotovina"
+			'note' => 'text NULL',
 			'date' => 'date NOT NULL',
 			'status' => "enum('draft','closed') NOT NULL DEFAULT 'draft'",
 			'total_net' => 'decimal(14,4) DEFAULT 0.0000',
