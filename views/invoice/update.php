@@ -15,6 +15,19 @@ $this->menu=array(
 	array('label'=>'Manage Invoice', 'url'=>array('admin')),
 );
 
+// Add Close Invoice button only if status is not closed
+if($model->status !== 'closed') {
+	$this->menu[] = array(
+		'label'=>'Close Invoice', 
+		'url'=>'#', 
+		'linkOptions'=>array(
+			'submit'=>array('close','id'=>$model->id),
+			'confirm'=>'Are you sure you want to close this invoice? Once closed, it cannot be modified.',
+			'class'=>'btn btn-warning'
+		)
+	);
+}
+
 $items = Item::model()->findAll();
 $invoiceLines = InvoiceLine::model()->findAllByAttributes(['invoice_id'=>$model->id]);
 
