@@ -18,6 +18,10 @@ class ShopOfficeModule extends CWebModule
 	{
 		if(parent::beforeControllerAction($controller, $action))
 		{
+			// Set fullwidth layout for all controllers in this module
+			// Use the module's layout path
+			$controller->layout = 'shopOffice.views.layouts.main';
+			
 			// this method is called before any module controller action is performed
 			// you may place customized code here
 			return true;
