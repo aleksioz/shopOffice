@@ -65,7 +65,8 @@ class InvoiceController extends Controller
         $model->date = date('Y-m-d');
         $model->status = 'draft';
 
-		$this->saveInvoice($model);
+		if (isset($_POST['Invoice']))
+			$this->saveInvoice($model); // fire if form is submitted
 
 		$this->render('create',array(
 			'model'=>$model,
@@ -84,7 +85,8 @@ class InvoiceController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		$this->saveInvoice($model);
+		if (isset($_POST['Invoice']))
+			$this->saveInvoice($model); 
 
 		$this->render('update',array(
 			'model'=>$model,
@@ -180,61 +182,56 @@ class InvoiceController extends Controller
 	 */
 	private function saveInvoice($model){
 
-		if(isset($_POST['Invoice']))
-		{
-			$model->attributes=$_POST['Invoice'];
-			
-			// Sanitize and validate input data
-			$model->payment_method = isset($_POST['Invoice']['payment_method']) ? 
-				CHtml::encode(strip_tags($_POST['Invoice']['payment_method'])) : '';
-			$model->note = isset($_POST['Invoice']['note']) ? 
-				CHtml::encode(strip_tags($_POST['Invoice']['note'])) : '';
+		$model->attributes=$_POST['Invoice'];
+		
+		// Sanitize and validate input data
+		$model->payment_method = isset($_POST['Invoice']['payment_method']) ? 
+			CHtml::encode(strip_tags($_POST['Invoice']['payment_method'])) : '';
+		$model->note = isset($_POST['Invoice']['note']) ? 
+			CHtml::encode(strip_tags($_POST['Invoice']['note'])) : '';
 
-			// Start transaction for saving invoice and its lines
-            $transaction = Yii::app()->db->beginTransaction();
+		// Start transaction for saving invoice and its lines
+		$transaction = Yii::app()->db->beginTransaction();
 
-            try {
-                if($model->save()) {
-                
-                    // Handle invoice lines if provided
-                    if(isset($_POST['InvoiceLine']) && is_array($_POST['InvoiceLine'])) {
-                        foreach($_POST['InvoiceLine'] as $lineData) {
-                            if(!empty($lineData['item_id']) && !empty($lineData['quantity'])) {
-                                $line = new InvoiceLine();	
-                                
-                                $line->invoice_id = $model->id;
-                                $line->item_id = $lineData['item_id'];
-                                $line->quantity = $lineData['quantity'];
-                                
-                                // Get item details to populate line data
-                                $item = Item::model()->findByPk($lineData['item_id']);
-                                
-                                if($item) {
-                                    $line->unit_price = $item->price;
-                                    $line->vat_percent = $item->vat_percent;
-                                    $line->pp_percent = $item->pp_percent;
-                                    $line->line_name = $item->name;
-                                }
+		try {
+			if($model->save()) {
+				// Handle invoice lines if provided
+				if(isset($_POST['InvoiceLine']) && is_array($_POST['InvoiceLine'])) {
+					foreach($_POST['InvoiceLine'] as $lineData) {
+						if(!empty($lineData['item_id']) && !empty($lineData['quantity'])) {
+							$line = new InvoiceLine();	
+							
+							$line->invoice_id = $model->id;
+							$line->item_id = $lineData['item_id'];
+							$line->quantity = $lineData['quantity'];
+							
+							// Get item details to populate line data
+							$item = Item::model()->findByPk($lineData['item_id']);
+							
+							if($item) {
+								$line->unit_price = $item->price;
+								$line->vat_percent = $item->vat_percent;
+								$line->pp_percent = $item->pp_percent;
+								$line->line_name = $item->name;
+							}
 
-                                if(!$line->save()) {
-                                    throw new Exception('Failed to save invoice line');
-                                }
-                            }
-                        }
-                    }
-                    
-                    $transaction->commit();
-                    $this->redirect(['update','id'=>$model->id]);
-                } else {
-                    $transaction->rollback();
-                }
-            } catch(Exception $e) {
-                $transaction->rollback();
-                Yii::app()->user->setFlash('error', 'Error creating invoice: ' . $e->getMessage());
-                echo $e->getMessage();
-            }
+							if(!$line->save()) {
+								throw new Exception('Failed to save invoice line');
+							}
+						}
+					}
+				}
+				
+				$transaction->commit();
+				$this->redirect(['update','id'=>$model->id]);
+			} else {
+				$transaction->rollback();
+			}
+		} catch(Exception $e) {
+			$transaction->rollback();
+			Yii::app()->user->setFlash('error', 'Error creating invoice: ' . $e->getMessage());
+			echo $e->getMessage();
 		}
-
 	}
 
     public function actionClose($id){
