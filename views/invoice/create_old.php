@@ -1,25 +1,141 @@
 <?php
 /* @var $this InvoiceController */
 /* @var $model Invoice */
-
-$this->breadcrumbs=array(
-	'Invoices'=>array('index'),
-	'Create',
-);
-
-$this->menu=array(
-	array('label'=>'List Invoice', 'url'=>array('index')),
-	array('label'=>'Manage Invoice', 'url'=>array('admin')),
-);
-
-// Get all available items for selection
-$items = Item::model()->findAll();
-
+/* @var $form CActiveForm */
+/* @var $items Item[] */
 ?>
 
-<h1>Create Invoice</h1>
+<div class="form">
 
-<?php $this->renderPartial('_form', array('model'=>$model, 'items'=>$items)); ?>
+<?php $form=$this->beginWidget('CActiveForm', array(
+	'id'=>'invoice-create-form',
+	// Please note: When you enable ajax validation, make sure the corresponding
+	// controller action is handling ajax validation correctly.
+	// See class documentation of CActiveForm for details on this,
+	// you need to use the performAjaxValidation()-method described there.
+	'enableAjaxValidation'=>false,
+)); ?>
+
+	<p class="note">Fields with <span class="required">*</span> are required.</p>
+
+	<?php echo $form->errorSummary($model); ?>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'number'); ?>
+		<?php echo $form->textField($model,'number'); ?>
+		<?php echo $form->error($model,'number'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'internal_number'); ?>
+		<?php echo $form->textField($model,'internal_number'); ?>
+		<?php echo $form->error($model,'internal_number'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'date'); ?>
+		<?php echo $form->textField($model,'date', array('value' => $model->date ? $model->date : date('Y-m-d'))); ?>
+		<?php echo $form->error($model,'date'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'status'); ?>
+		<?php echo $form->dropDownList($model,'status', array('draft'=>'Draft', 'closed'=>'Closed'), array('value' => 'draft')); ?>
+		<?php echo $form->error($model,'status'); ?>
+	</div>
+
+	<!-- Invoice Lines Section -->
+	<div class="invoice-lines-section">
+		<h3>Invoice Items</h3>
+		<div id="invoice-lines">
+			<!-- Existing invoice lines (if editing) -->
+			<?php if(!empty($model->invoiceLines)): ?>
+				<?php foreach($model->invoiceLines as $index => $line): ?>
+					<div class="invoice-line" data-line-index="<?php echo $index; ?>">
+						<div class="row">
+							<label>Item:</label>
+							<?php echo CHtml::dropDownList('InvoiceLine[' . $index . '][item_id]', $line->item_id, 
+								CHtml::listData($items, 'id', 'name'), 
+								array('empty' => 'Select Item...', 'class' => 'item-select')
+							); ?>
+						</div>
+						<div class="row">
+							<label>Quantity:</label>
+							<?php echo CHtml::numberField('InvoiceLine[' . $index . '][quantity]', $line->quantity, array('step' => '0.01', 'min' => '0', 'class' => 'quantity-input')); ?>
+						</div>
+						<div class="row">
+							<label>Unit Price:</label>
+							<input type="text" name="unit_price_display" readonly class="unit-price-display" value="<?php echo $line->item ? number_format($line->item->price, 2) : ''; ?>" />
+						</div>
+						<div class="row">
+							<label>VAT %:</label>
+							<input type="text" name="vat_percent_display" readonly class="vat-percent-display" value="<?php echo $line->item ? number_format($line->item->vat_percent, 2) : ''; ?>" />
+						</div>
+						<div class="row">
+							<label>PP %:</label>
+							<input type="text" name="pp_percent_display" readonly class="pp-percent-display" value="<?php echo $line->item ? number_format($line->item->pp_percent, 2) : ''; ?>" />
+						</div>
+						<div class="row">
+							<label>Line Total:</label>
+							<input type="text" name="line_total_display" readonly class="line-total-display" value="<?php echo number_format($line->total_gross, 2); ?>" />
+						</div>
+						<div class="row">
+							<button type="button" class="remove-line-btn btn btn-danger">Remove</button>
+						</div>
+						<hr />
+					</div>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</div>
+		<button type="button" id="add-line-btn" class="btn btn-secondary">Add Item</button>
+	</div>
+
+	<!-- Totals Section -->
+	<div class="totals-section">
+		<div class="row">
+			<?php echo $form->labelEx($model,'total_net'); ?>
+			<?php echo $form->textField($model,'total_net', array('readonly' => true)); ?>
+			<?php echo $form->error($model,'total_net'); ?>
+		</div>
+
+		<div class="row">
+			<?php echo $form->labelEx($model,'total_vat'); ?>
+			<?php echo $form->textField($model,'total_vat', array('readonly' => true)); ?>
+			<?php echo $form->error($model,'total_vat'); ?>
+		</div>
+
+		<div class="row">
+			<?php echo $form->labelEx($model,'total_pp'); ?>
+			<?php echo $form->textField($model,'total_pp', array('readonly' => true)); ?>
+			<?php echo $form->error($model,'total_pp'); ?>
+		</div>
+
+		<div class="row">
+			<?php echo $form->labelEx($model,'total_gross'); ?>
+			<?php echo $form->textField($model,'total_gross', array('readonly' => true)); ?>
+			<?php echo $form->error($model,'total_gross'); ?>
+		</div>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'created_at'); ?>
+		<?php echo $form->textField($model,'created_at', array('readonly' => true, 'value' => date('Y-m-d H:i:s'))); ?>
+		<?php echo $form->error($model,'created_at'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'updated_at'); ?>
+		<?php echo $form->textField($model,'updated_at', array('readonly' => true, 'value' => date('Y-m-d H:i:s'))); ?>
+		<?php echo $form->error($model,'updated_at'); ?>
+	</div>
+
+	<div class="row buttons">
+		<?php echo CHtml::submitButton('Create Invoice'); ?>
+	</div>
+
+<?php $this->endWidget(); ?>
+
+</div><!-- form -->
 
 <!-- Hidden template for invoice line -->
 <div id="line-template" style="display: none;">
@@ -57,7 +173,6 @@ $items = Item::model()->findAll();
 	</div>
 </div>
 
-<!-- JS koja upravlja dinamičkim dodavanjem i uklanjanjem redova fakture, kao i izračunavanjem ukupnih vrednosti -->
 <script type="text/javascript">
 $(document).ready(function() {
     var lineIndex = 0;

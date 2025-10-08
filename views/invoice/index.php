@@ -1,21 +1,20 @@
 <?php
+/* @var $this InvoiceController */
+/* @var $dataProvider CActiveDataProvider */
 
-echo "<table border='1'>";
-	echo "<tr>";
-	if (!empty($invoices)) {
-		$keys = array_keys($invoices[0]->attributes);
-		foreach ($keys as $key) {
-			echo "<th>" . htmlspecialchars($key) . "</th>";
-		}
-	}
-	echo "</tr>";
+$this->breadcrumbs=array(
+	'Invoices',
+);
 
-foreach ($invoices as $invoice) {
-	echo "<tr>";
-	foreach ($invoice->attributes as $value) {
-		echo "<td>" . htmlspecialchars($value) . "</td>";
-	}
-	echo "</tr>";
-}
-echo "</table>";
+$this->menu=array(
+	array('label'=>'Create Invoice', 'url'=>array('create')),
+	array('label'=>'Manage Invoice', 'url'=>array('admin')),
+);
+?>
 
+<h1>Invoices</h1>
+
+<?php $this->widget('zii.widgets.CListView', array(
+	'dataProvider'=>$dataProvider,
+	'itemView'=>'_view',
+)); ?>
