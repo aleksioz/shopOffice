@@ -69,8 +69,40 @@
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+		<?php if(!$model->isNewRecord): ?>
+			<?php echo CHtml::button('Delete', array(
+				'class'=>'delete-button',
+				'style'=>'background-color: #d9534f; color: white; border: 1px solid #d43f3a; padding: 6px 12px; margin-left: 10px;',
+				'onclick'=>'deleteItem('.$model->id.');'
+			)); ?>
+		<?php endif; ?>
 	</div>
 
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+
+<?php if(!$model->isNewRecord): ?>
+<script type="text/javascript">
+function deleteItem(id) {
+	if(confirm('Are you sure you want to delete this item?')) {
+		// Create a form to submit the DELETE request
+		var form = document.createElement('form');
+		form.method = 'POST';
+		form.action = '<?php echo $this->createUrl('delete', array('id' => $model->id)); ?>';
+		
+		// Add CSRF token if available
+		<?php if(Yii::app()->request->enableCsrfValidation): ?>
+		var csrfInput = document.createElement('input');
+		csrfInput.type = 'hidden';
+		csrfInput.name = '<?php echo Yii::app()->request->csrfTokenName; ?>';
+		csrfInput.value = '<?php echo Yii::app()->request->csrfToken; ?>';
+		form.appendChild(csrfInput);
+		<?php endif; ?>
+		
+		document.body.appendChild(form);
+		form.submit();
+	}
+}
+</script>
+<?php endif; ?>
