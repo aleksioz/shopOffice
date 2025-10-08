@@ -95,11 +95,11 @@ $(document).ready(function() {
     });
     
     function calculateLineTotal(line) {
-        var quantity = parseFloat(line.find('.quantity-input').val()) || 0;
-        var unitPrice = parseFloat(line.find('.unit-price-display').val()) || 0;
-        var vatPercent = parseFloat(line.find('.vat-percent-display').val()) || 0;
-        var ppPercent = parseFloat(line.find('.pp-percent-display').val()) || 0;
-        
+        var quantity = parseFloat(line.find('.quantity-input').val() || line.find('.quantity-input').text()) || 0;
+        var unitPrice = parseFloat(line.find('.unit-price-display').val() || line.find('.unit-price-display').text()) || 0;
+        var vatPercent = parseFloat(line.find('.vat-percent-display').val() || line.find('.vat-percent-display').text()) || 0;
+        var ppPercent = parseFloat(line.find('.pp-percent-display').val() || line.find('.pp-percent-display').text()) || 0;
+
         var net = quantity * unitPrice;
         var vat = net * (vatPercent / 100);
         var pp = net * (ppPercent / 100);
@@ -116,15 +116,15 @@ $(document).ready(function() {
         var totalGross = 0;
         
         $('.invoice-line').each(function() {
-            var quantity = parseFloat($(this).find('.quantity-input').val()) || 0;
-            var unitPrice = parseFloat($(this).find('.unit-price-display').val()) || 0;
-            var vatPercent = parseFloat($(this).find('.vat-percent-display').val()) || 0;
-            var ppPercent = parseFloat($(this).find('.pp-percent-display').val()) || 0;
+            let quantity = parseFloat($(this).find('.quantity-input').val() || $(this).find('.quantity-input').text()) || 0;
+            let unitPrice = parseFloat($(this).find('.unit-price-display').val() || $(this).find('.unit-price-display').text()) || 0;
+            let vatPercent = parseFloat($(this).find('.vat-percent-display').val() || $(this).find('.vat-percent-display').text()) || 0;
+            let ppPercent = parseFloat($(this).find('.pp-percent-display').val() || $(this).find('.pp-percent-display').text()) || 0;
             
-            var net = quantity * unitPrice;
-            var vat = net * (vatPercent / 100);
-            var pp = net * (ppPercent / 100);
-            var gross = net + vat + pp;
+            let net = quantity * unitPrice;
+            let vat = net * (vatPercent / 100);
+            let pp = net * (ppPercent / 100);
+            let gross = net + vat + pp;
             
             totalNet += net;
             totalVat += vat;
