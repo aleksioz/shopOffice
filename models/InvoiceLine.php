@@ -48,14 +48,21 @@ class InvoiceLine extends CActiveRecord
         $gross = round($net + $vat + $pp, 4);
 
         return [
-            'line_gross' => $gross
+            'line_gross' => $gross,
+            'line_net' => $net,
+            'line_vat' => $vat,
+            'line_pp'  => $pp,
         ];
     }
 
     protected function beforeSave(){
         // Always ensure amounts are up-to-date (for consistency)
-        $a = $this->calculateLineTotals();
-        $this->line_gross = $a['line_gross'];
+        $totals = $this->calculateLineTotals();
+        $this->line_gross = $totals['line_gross'];
+        $this->line_net = $totals['line_net'];
+        $this->line_vat = $totals['line_vat'];
+        $this->line_pp = $totals['line_pp'];    
+        $this->line_sku = $this->item ? $this->item->sku : null;
         return parent::beforeSave();
     }
 }
