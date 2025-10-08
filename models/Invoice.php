@@ -43,8 +43,7 @@ class Invoice extends CActiveRecord
 
         if(!$this->isNewRecord){
             $old = self::model()->findByPk($this->id);
-            if($old && $old->status === 'closed' && $this->status !== 'closed'){
-                // allow changing status only to closed, but not re-opening:
+            if($old->status === 'closed'){
                 throw new CHttpException(400, 'Closed Invoice cannot be modified.');
             }
         }
