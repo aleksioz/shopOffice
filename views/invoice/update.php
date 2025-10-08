@@ -14,8 +14,13 @@ $this->menu=array(
 	array('label'=>'View Invoice', 'url'=>array('view', 'id'=>$model->id)),
 	array('label'=>'Manage Invoice', 'url'=>array('admin')),
 );
+
+$items = Item::model()->findAll();
+
 ?>
 
 <h1>Update Invoice <?php echo $model->id; ?></h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>
+
+<?php $this->renderPartial('_invoice_line', array('model'=>$model, 'items'=>$items)); ?>
