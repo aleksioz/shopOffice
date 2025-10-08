@@ -1,94 +1,57 @@
-<?php
-/* @var $this Controller */
-/* @var $content string */
-?>
+<?php /* @var $this Controller */ ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="language" content="en">
+
+	<!-- blueprint CSS framework -->
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css" media="screen, projection">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/print.css" media="print">
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css" media="screen, projection">
+	<![endif]-->
+
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">
+
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
-	
-	<!-- Bootstrap CSS for fullwidth layout -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	<!-- jQuery from Google CDN -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-	
-	<style>
-		/* Fullwidth layout styles */
-		body {
-			margin: 0;
-			padding: 0;
-		}
-		
-		.container-fluid {
-			width: 100%;
-			padding: 15px;
-		}
-		
-		.fullwidth-content {
-			width: 100%;
-			max-width: none;
-			margin: 0;
-			padding: 0;
-		}
-		
-		/* Optional: Remove default margins/padding from content */
-		.content-wrapper {
-			padding: 20px;
-			background: #fff;
-			min-height: calc(100vh - 40px);
-		}
-		
-		/* Navigation/header styling */
-		.module-header {
-			background: #f8f9fa;
-			border-bottom: 1px solid #dee2e6;
-			padding: 15px 0;
-			margin-bottom: 20px;
-		}
-		
-		.module-title {
-			font-size: 24px;
-			font-weight: bold;
-			color: #495057;
-		}
-	</style>
 </head>
 
 <body>
-	<div class="container-fluid fullwidth-content">
-		<div class="module-header">
-			<div class="row">
-				<div class="col-md-6">
-					<h1 class="module-title">Shop Office</h1>
-				</div>
-				<div class="col-md-6 text-right">
-					<?php 
-					// Breadcrumbs or navigation can go here
-					if(isset($this->breadcrumbs)):
-						echo '<nav class="breadcrumb">';
-						foreach($this->breadcrumbs as $label=>$url) {
-							if(is_string($label) || is_array($url)) {
-								echo CHtml::link($label, $url) . ' / ';
-							} else {
-								echo '<span>' . $url . '</span>';
-							}
-						}
-						echo '</nav>';
-					endif;
-					?>
-				</div>
-			</div>
-		</div>
-		
-		<div class="content-wrapper">
-			<?php echo $content; ?>
-		</div>
-	</div>
 
-	<!-- Optional: jQuery and Bootstrap JS -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<div class="container" id="page">
+
+	<div id="header">
+		<div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
+	</div><!-- header -->
+
+	<div id="mainmenu">
+		<?php $this->widget('zii.widgets.CMenu',array(
+			'items'=>array(
+				array('label'=>'Home', 'url'=>array('/site/index')),
+				array('label'=>'Invoices', 'url'=>array('/shopOffice/invoice/index')),
+				array('label'=>'Items', 'url'=>array('/shopOffice/item/index'))
+			),
+		)); ?>	
+	</div><!-- mainmenu -->
+	<?php if(isset($this->breadcrumbs)):?>
+		<?php $this->widget('zii.widgets.CBreadcrumbs', array(
+			'links'=>$this->breadcrumbs,
+		)); ?><!-- breadcrumbs -->
+	<?php endif?>
+
+	<?php echo $content; ?>
+
+	<div class="clear"></div>
+
+	<div id="footer">
+		Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
+		All Rights Reserved.<br/>
+		<?php echo Yii::powered(); ?>
+	</div><!-- footer -->
+
+</div><!-- page -->
+
 </body>
 </html>

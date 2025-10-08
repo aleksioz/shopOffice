@@ -8,7 +8,6 @@ $this->breadcrumbs=array(
 
 $this->menu=array(
 	array('label'=>'Create Invoice', 'url'=>array('create')),
-	array('label'=>'Manage Invoice', 'url'=>array('admin')),
 );
 ?>
 
