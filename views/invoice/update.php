@@ -16,10 +16,13 @@ $this->menu=array(
 );
 
 $items = Item::model()->findAll();
+$invoiceLines = InvoiceLine::model()->findAllByAttributes(['invoice_id'=>$model->id]);
 
 ?>
 
 <h1>Update Invoice <?php echo $model->id; ?></h1>
+
+<?php $this->renderPartial('_existing_inv_lines', array('invoiceLines'=>$invoiceLines)); ?>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>
 

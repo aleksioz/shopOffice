@@ -3,7 +3,6 @@
 /* @var $model Invoice */
 ?>
 
-
 <!-- Hidden template for invoice line -->
 <div id="line-template" style="display: none;">
 	<div class="invoice-line" data-line-index="" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd;">
@@ -39,8 +38,6 @@
 		</div>
 	</div>
 </div>
-
-
 
 <!-- JS koja upravlja dinamičkim dodavanjem i uklanjanjem redova fakture, kao i izračunavanjem ukupnih vrednosti -->
 <script type="text/javascript">

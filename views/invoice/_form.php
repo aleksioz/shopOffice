@@ -76,19 +76,19 @@
 						</div>
 						<div class="row">
 							<label>Unit Price:</label>
-							<input type="text" name="unit_price_display" readonly class="unit-price-display" value="<?php echo $line->item ? number_format($line->item->price, 2) : ''; ?>" />
+							<input type="text" name="unit_price_display" readonly class="unit-price-display" value="<?php echo $line->item ? number_format($line->item->price, 4) : ''; ?>" />
 						</div>
 						<div class="row">
 							<label>VAT %:</label>
-							<input type="text" name="vat_percent_display" readonly class="vat-percent-display" value="<?php echo $line->item ? number_format($line->item->vat_percent, 2) : ''; ?>" />
+							<input type="text" name="vat_percent_display" readonly class="vat-percent-display" value="<?php echo $line->item ? number_format($line->item->vat_percent, 4) : ''; ?>" />
 						</div>
 						<div class="row">
 							<label>PP %:</label>
-							<input type="text" name="pp_percent_display" readonly class="pp-percent-display" value="<?php echo $line->item ? number_format($line->item->pp_percent, 2) : ''; ?>" />
+							<input type="text" name="pp_percent_display" readonly class="pp-percent-display" value="<?php echo $line->item ? number_format($line->item->pp_percent, 4) : ''; ?>" />
 						</div>
 						<div class="row">
 							<label>Line Total:</label>
-							<input type="text" name="line_total_display" readonly class="line-total-display" value="<?php echo number_format($line->total_gross, 2); ?>" />
+							<input type="text" name="line_total_display" readonly class="line-total-display" value="<?php echo number_format($line->total_gross, 4); ?>" />
 						</div>
 						<div class="row">
 							<button type="button" class="remove-line-btn btn btn-danger">Remove</button>
