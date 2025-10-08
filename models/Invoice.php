@@ -38,6 +38,9 @@ class Invoice extends CActiveRecord
 
     // Prevent changes if closed
     protected function beforeSave(){
+
+        $this->updateTotals();
+
         if(!$this->isNewRecord){
             $old = self::model()->findByPk($this->id);
             if($old && $old->status === 'closed' && $this->status !== 'closed'){
@@ -47,4 +50,28 @@ class Invoice extends CActiveRecord
         }
         return parent::beforeSave();
     }
+
+
+    // Update totals based on lines
+    public function updateTotals(){
+        
+        $lines = InvoiceLine::model()->findAllByAttributes(['invoice_id'=>$this->id]);
+        if(!$lines) {
+            throw new CHttpException(400, 'No invoice lines found to calculate totals, so invoice is empty.');
+        }
+
+
+        $totalNet = 0;
+        $totalVat = 0;
+        $totalPp = 0;
+        $totalGross = 0;
+
+        foreach($lines as $line) {
+            $this->total_net += $line->line_net;
+            $this->total_vat += $line->line_vat;
+            $this->total_pp += $line->line_pp;
+            $this->total_gross += $line->line_gross;
+        }
+    }
+
 }
