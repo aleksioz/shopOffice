@@ -26,7 +26,8 @@ class ShopOfficeModule extends CWebModule
 			Yii::app()->getController()->widget('zii.widgets.CMenu', array(
 				'items' => array(
 				array('label'=>'Invoices', 'url'=>array('/shopOffice/invoice/index')),
-				array('label'=>'Items', 'url'=>array('/shopOffice/item/index'))
+				array('label'=>'Items', 'url'=>array('/shopOffice/item/index')),
+				array('label'=>'Sales Report', 'url'=>array('/shopOffice/report/salesReport')),
 				),
 				'htmlOptions' => array('class' => 'menu')
 			));

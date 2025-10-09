@@ -73,4 +73,39 @@ class Invoice extends CActiveRecord
         }
     }
 
+    /**
+     * Retrieves a list of models based on the current search/filter conditions.
+     *
+     * @return CActiveDataProvider the data provider that can return the models
+     * based on the search/filter conditions.
+     */
+    public function search()
+    {
+        $criteria = new CDbCriteria;
+
+        $criteria->compare('id', $this->id);
+        $criteria->compare('number', $this->number, true);
+        $criteria->compare('internal_number', $this->internal_number, true);
+        $criteria->compare('payment_method', $this->payment_method, true);
+        $criteria->compare('note', $this->note, true);
+        $criteria->compare('date', $this->date, true);
+        $criteria->compare('total_net', $this->total_net);
+        $criteria->compare('total_vat', $this->total_vat);
+        $criteria->compare('total_pp', $this->total_pp);
+        $criteria->compare('total_gross', $this->total_gross);
+        $criteria->compare('status', $this->status, true);
+        $criteria->compare('created_at', $this->created_at, true);
+        $criteria->compare('updated_at', $this->updated_at, true);
+
+        return new CActiveDataProvider($this, array(
+            'criteria' => $criteria,
+            'sort' => array(
+                'defaultOrder' => 'date DESC',
+            ),
+            'pagination' => array(
+                'pageSize' => 20,
+            ),
+        ));
+    }
+
 }
