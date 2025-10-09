@@ -87,7 +87,7 @@ URL: /shopOffice/report/salesReport
 shopOffice/
 ├── ShopOfficeModule.php          # Definicija modula
 ├── components/
-│   └── InvoiceService.php        # Servis za složenu logiku računa
+│   └── InvoiceService.php        # Servis za zatvaranje logiku računa
 ├── controllers/
 │   ├── DefaultController.php     # Početna stranica modula
 │   ├── InvoiceController.php     # CRUD operacije za račune
@@ -99,6 +99,7 @@ shopOffice/
 │   └── Item.php                 # Model artikla
 ├── views/                       # View fajlovi organizovani po kontrolerima
 └── migrations/                  # Migracije baze podataka
+└── tests/                       # Definisani testovi (global - modern - phpunit)
 ```
 
 ### Ključne projektne odluke
@@ -139,9 +140,9 @@ shopOffice/
 - RESTful URL struktura
 
 #### 7. **Lokalizacija**
-- `attributeLabels()` na bosanskom/hrvatskom jeziku
+- `attributeLabels()` na hrvatskom jeziku
 - Formatiranje brojeva u lokalnom formatu
-- Valuta u KM (Konvertibilne marke)
+- Valuta u Euro
 
 #### 8. **Search funkcionalnost**
 - Implementiran `search()` metod za GridView
@@ -152,6 +153,7 @@ shopOffice/
 - Koriste se database transakcije za složene operacije
 - Rollback u slučaju greške
 - Osigurava konzistentnost podataka
+- Racuni totala i drugih iznosa su u Backend-u
 
 #### 10. **Reporting sistem**
 - Odvojeni ReportController za izvještaje
