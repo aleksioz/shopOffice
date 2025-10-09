@@ -100,7 +100,15 @@ class InvoiceController extends Controller
 	 */
 	public function actionDelete($id)
 	{
-		$this->loadModel($id)->delete();
+
+		$invoice = $this->loadModel($id);
+		if($invoice->status === 'closed'){
+			$this->redirect(['update', 'id' => $invoice->id]);
+		} else {
+			// Also delete associated invoice lines
+			InvoiceLine::model()->deleteAllByAttributes(['invoice_id' => $invoice->id]);
+			$invoice->delete();
+		}
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		$this->redirect(['index']);

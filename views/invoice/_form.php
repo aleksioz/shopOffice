@@ -148,7 +148,7 @@
 			<?php echo CHtml::button('Delete', array(
 				'class'=>'delete-button',
 				'style'=>'background-color: #d9534f; color: white; border: 1px solid #d43f3a; padding: 6px 12px; margin-left: 10px;',
-				'onclick'=>'deleteItem('.$model->id.');'
+				'onclick'=>'deleteItem('.$model->id.', '.$model->status.');'
 			)); ?>
 		<?php endif; ?>
 	</div>
@@ -160,7 +160,11 @@
 
 <?php if(!$model->isNewRecord): ?>
 <script type="text/javascript">
-function deleteItem(id) {
+function deleteItem(id, status='draft') {
+	if(status !== 'draft') {
+		alert('Closed Invoice cannot be deleted.');
+		return;
+	}
 	if(confirm('Are you sure you want to delete this Invoice?')) {
 		// Create a form to submit the DELETE request
 		var form = document.createElement('form');
