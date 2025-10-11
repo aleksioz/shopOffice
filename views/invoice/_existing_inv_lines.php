@@ -18,19 +18,19 @@
             </div>
             <div style="flex: 1;">
                 <label>Unit Price:</label>
-                <input type="text" readonly style="width:60px" class="unit-price-input" value="<?= number_format($line->unit_price, 4); ?>" />
+                <input type="number" readonly style="width:60px" class="unit-price-input" value="<?= number_format($line->unit_price, 4); ?>" />
             </div>
             <div style="flex: 1;">
                 <label>VAT %:</label>
-                <input type="text" readonly style="width:60px" class="vat-percent-input" value="<?= number_format($line->vat_percent, 4); ?>" />
+                <input type="number" readonly style="width:60px" class="vat-percent-input" value="<?= number_format($line->vat_percent, 4); ?>" />
             </div>
             <div style="flex: 1;">
                 <label>PP %:</label>
-                <input type="text" readonly style="width:60px" class="pp-percent-input" value="<?= number_format($line->pp_percent, 4); ?>" />
+                <input type="number" readonly style="width:60px" class="pp-percent-input" value="<?= number_format($line->pp_percent, 4); ?>" />
             </div>
             <div style="flex: 1;">
                 <label>Line Total:</label>
-                <input type="text" readonly style="width:60px" class="line-total-input" value="<?= number_format($line->line_gross, 4); ?>" readonly />
+                <input type="number" readonly style="width:60px" class="line-total-input" value="<?= number_format($line->line_gross, 4); ?>" readonly />
             </div>
             <div style="flex: 0 0 auto;">
                 <button type="button" class="remove-line-btn btn btn-danger">Remove</button>

@@ -163,22 +163,6 @@ function deleteItem(id, status='draft') {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    var lineIndex = 0;
-
-	// Add data-line-index to existing lines
-	// $('#invoice-lines .invoice-line').each(function(index) {
-	// 	$(this).attr('data-line-index', lineIndex);
-	// 	$(this).find('[name*="InvoiceLine[]"]').each(function() {
-	// 		const name = $(this).attr('name');
-	// 		const newName = name.replace(/InvoiceLine\[\]/g, 'InvoiceLine[' + lineIndex + ']');
-	// 		$(this).attr('name', newName);
-	// 	});
-	// 	lineIndex++;
-	// });
-
-	// if( lineIndex > 0 ){
-	// 	lineIndex--; // Adjust for next addition
-	// }
 
     var itemsData = {
         <?php foreach($items as $item): ?>
@@ -194,34 +178,31 @@ $(document).ready(function() {
     // Add new line
     $('#add-line-btn').click(function() {
         let template = $('#line-template').html();
-        // template = template.replace(/data-line-index=""/g, 'data-line-index="' + lineIndex + '"');
-        // template = template.replace(/InvoiceLine\[\]\[/g, 'InvoiceLine[' + lineIndex + '][');
+		template = template.replace(/invoice-line-hidden/g, 'invoice-line');
         $('#invoice-lines').append(template);
-        // lineIndex++;
         attachLineEvents();
     });
     
     // Remove line
     $(document).on('click', '.remove-line-btn', function() {
         $(this).closest('.invoice-line').remove();
-        // lineIndex--;
         calculateTotals();
     });
     
     // Item selection change
     $(document).on('change', '.item-select', function() {
-        var itemId = $(this).val();
-        var line = $(this).closest('.invoice-line');
+        const itemId = $(this).val();
+        const line = $(this).closest('.invoice-line');
         
         if (itemId && itemsData[itemId]) {
-            var item = itemsData[itemId];
-            line.find('.unit-price-display').val(parseFloat(item.price).toFixed(2));
-            line.find('.vat-percent-display').val(parseFloat(item.vat_percent).toFixed(2));
-            line.find('.pp-percent-display').val(parseFloat(item.pp_percent).toFixed(2));
+            const item = itemsData[itemId];
+            line.find('.unit-price-input').val(parseFloat(item.price).toFixed(4));
+            line.find('.vat-percent-input').val(parseFloat(item.vat_percent).toFixed(4));
+            line.find('.pp-percent-input').val(parseFloat(item.pp_percent).toFixed(4));
         } else {
-            line.find('.unit-price-display').val(0);
-            line.find('.vat-percent-display').val(0);
-            line.find('.pp-percent-display').val(0);
+            line.find('.unit-price-input').val(0);
+            line.find('.vat-percent-input').val(0);
+            line.find('.pp-percent-input').val(0);
         }
         calculateLineTotal(line);
     });
@@ -233,47 +214,58 @@ $(document).ready(function() {
     });
     
     function calculateLineTotal(line) {
-        var quantity = parseFloat(line.find('.quantity-input').val() || line.find('.quantity-input').text()) || 0;
-        var unitPrice = parseFloat(line.find('.unit-price-display').val() || line.find('.unit-price-display').text()) || 0;
-        var vatPercent = parseFloat(line.find('.vat-percent-display').val() || line.find('.vat-percent-display').text()) || 0;
-        var ppPercent = parseFloat(line.find('.pp-percent-display').val() || line.find('.pp-percent-display').text()) || 0;
 
-        var net = quantity * unitPrice;
-        var vat = net * (vatPercent / 100);
-        var pp = net * (ppPercent / 100);
-        var gross = net + vat + pp;
-        
-        line.find('.line-total-display').val(gross.toFixed(2));
+        const quantity = parseFloat(line.find('.quantity-input').val()) || 0.0;
+        const unitPrice = parseFloat(line.find('.unit-price-input').val()) || 0.0;
+        const vatPercent = parseFloat(line.find('.vat-percent-input').val()) || 0.0;
+        const ppPercent = parseFloat(line.find('.pp-percent-input').val()) || 0.0;
+
+        const net = quantity * unitPrice;
+        const vat = net * (vatPercent / 100);
+        const pp = net * (ppPercent / 100);
+        const gross = net + vat + pp;
+
+		line.find('.line-pp-input').val(pp.toFixed(4));
+		line.find('.line-vat-input').val(vat.toFixed(4));
+		line.find('.line-net-input').val(net.toFixed(4));
+        line.find('.line-total-input').val(gross.toFixed(4));
         calculateTotals();
     }
     
     function calculateTotals() {
-        var totalNet = 0;
-        var totalVat = 0;
-        var totalPp = 0;
-        var totalGross = 0;
+        let totalNet = 0;
+        let totalVat = 0;
+        let totalPp = 0;
+        let totalGross = 0;
         
         $('.invoice-line').each(function() {
-            let quantity = parseFloat($(this).find('.quantity-input').val() || $(this).find('.quantity-input').text()) || 0;
-            let unitPrice = parseFloat($(this).find('.unit-price-display').val() || $(this).find('.unit-price-display').text()) || 0;
-            let vatPercent = parseFloat($(this).find('.vat-percent-display').val() || $(this).find('.vat-percent-display').text()) || 0;
-            let ppPercent = parseFloat($(this).find('.pp-percent-display').val() || $(this).find('.pp-percent-display').text()) || 0;
-            
-            let net = quantity * unitPrice;
-            let vat = net * (vatPercent / 100);
-            let pp = net * (ppPercent / 100);
-            let gross = net + vat + pp;
-            
+            const quantity = parseFloat($(this).find('.quantity-input').val()) || 0;
+            const unitPrice = parseFloat($(this).find('.unit-price-input').val()) || 0;
+            const vatPercent = parseFloat($(this).find('.vat-percent-input').val()) || 0;
+            const ppPercent = parseFloat($(this).find('.pp-percent-input').val()) || 0;
+
+            const net = quantity * unitPrice;
+            const vat = net * (vatPercent / 100);
+            const pp = net * (ppPercent / 100);
+            const gross = net + vat + pp;
+
             totalNet += net;
             totalVat += vat;
             totalPp += pp;
             totalGross += gross;
         });
-        
-        $('#Invoice_total_net').val(totalNet.toFixed(2));
-        $('#Invoice_total_vat').val(totalVat.toFixed(2));
-        $('#Invoice_total_pp').val(totalPp.toFixed(2));
-        $('#Invoice_total_gross').val(totalGross.toFixed(2));
+
+		console.log('Totals calculated:', {
+			totalNet: totalNet,
+			totalVat: totalVat,
+			totalPp: totalPp,
+			totalGross: totalGross
+		});
+
+        $('#Invoice_total_net').val(totalNet.toFixed(4));
+        $('#Invoice_total_vat').val(totalVat.toFixed(4));
+        $('#Invoice_total_pp').val(totalPp.toFixed(4));
+        $('#Invoice_total_gross').val(totalGross.toFixed(4));
     }
     
     function attachLineEvents() {
