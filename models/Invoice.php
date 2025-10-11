@@ -39,8 +39,6 @@ class Invoice extends CActiveRecord
     // Prevent changes if closed
     protected function beforeSave(){
 
-        $this->updateTotals();
-
         if(!$this->isNewRecord){
             $old = self::model()->findByPk($this->id);
             if($old->status === 'closed'){
@@ -73,39 +71,76 @@ class Invoice extends CActiveRecord
         }
     }
 
-    /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
-     */
-    public function search()
-    {
-        $criteria = new CDbCriteria;
+	/**
+	 * Saves an invoice to the database or storage system.
+	 *
+	 * This function handles the creation or updating of invoice records,
+	 * including validation of invoice data and persistence to the data store.
+	 *
+	 * @param array $invoiceData The invoice data to be saved
+	 * @return bool|int Returns true on successful save, or invoice ID if newly created, false on failure
+	 * @throws InvalidArgumentException When invoice data is invalid
+	 * @throws DatabaseException When database operation fails
+	 */
+	public function saveInvoice(){
 
-        $criteria->compare('id', $this->id);
-        $criteria->compare('number', $this->number, true);
-        $criteria->compare('internal_number', $this->internal_number, true);
-        $criteria->compare('payment_method', $this->payment_method, true);
-        $criteria->compare('note', $this->note, true);
-        $criteria->compare('date', $this->date, true);
-        $criteria->compare('total_net', $this->total_net);
-        $criteria->compare('total_vat', $this->total_vat);
-        $criteria->compare('total_pp', $this->total_pp);
-        $criteria->compare('total_gross', $this->total_gross);
-        $criteria->compare('status', $this->status, true);
-        $criteria->compare('created_at', $this->created_at, true);
-        $criteria->compare('updated_at', $this->updated_at, true);
+		$this->attributes=$_POST['Invoice'];
+		
+		// Sanitize and validate input data
+		$this->payment_method = isset($_POST['Invoice']['payment_method']) ? 
+			CHtml::encode(strip_tags($_POST['Invoice']['payment_method'])) : '';
+		$this->note = isset($_POST['Invoice']['note']) ? 
+			CHtml::encode(strip_tags($_POST['Invoice']['note'])) : '';
 
-        return new CActiveDataProvider($this, array(
-            'criteria' => $criteria,
-            'sort' => array(
-                'defaultOrder' => 'date DESC',
-            ),
-            'pagination' => array(
-                'pageSize' => 20,
-            ),
-        ));
-    }
+		// Start transaction for saving invoice and its lines
+		$transaction = Yii::app()->db->beginTransaction();
+
+		try {
+			if($this->save()) { // Here we save the invoice itself, and exec beforeSave in model
+				
+				// Handle invoice lines if provided
+				if(isset($_POST['InvoiceLine']) && is_array($_POST['InvoiceLine']) && count($_POST['InvoiceLine']) == 2) {
+
+					// First, delete existing lines for update scenarios
+					InvoiceLine::model()->deleteAllByAttributes(['invoice_id' => $this->id]);
+
+					do {
+						$item_id = array_shift($_POST['InvoiceLine']['item_id']);
+						$quantity = array_shift($_POST['InvoiceLine']['quantity']);
+						
+						if( empty($item_id) || empty($quantity) ) continue;
+
+						// Get item details to populate line data
+						$item = Item::model()->findByPk($item_id);
+					
+						$line = new InvoiceLine();
+						$line->invoice_id = $this->id;
+						$line->item_id = $item_id;
+						$line->quantity = $quantity;
+
+						$line->unit_price = $item->price;
+						$line->vat_percent = $item->vat_percent;
+						$line->pp_percent = $item->pp_percent;
+						$line->line_name = $item->name;
+
+						if(!$line->save()) 
+							throw new Exception('Failed to save invoice line');
+
+					}
+					while (!empty($_POST['InvoiceLine']['item_id']) || !empty($_POST['InvoiceLine']['quantity']));
+				}
+
+                $this->updateTotals();
+				
+				$transaction->commit();
+			} else {
+				$transaction->rollback();
+			}
+		} catch(Exception $e) {
+			$transaction->rollback();
+			Yii::app()->user->setFlash('error', 'Error creating iiinvoice: ' . $e->getMessage());
+			echo $e->getMessage();
+		}
+	}
 
 }
