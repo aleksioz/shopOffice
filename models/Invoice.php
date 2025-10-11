@@ -1,6 +1,7 @@
 <?php
 class Invoice extends CActiveRecord
 {
+
     public static function model($className=__CLASS__){ return parent::model($className); }
     public function tableName(){ return 'invoice'; }
 
@@ -53,22 +54,26 @@ class Invoice extends CActiveRecord
     public function updateTotals(){
         
         $lines = InvoiceLine::model()->findAllByAttributes(['invoice_id'=>$this->id]);
-        if(!$lines) {
+
+        if( !$lines || !is_array($lines) ) 
             throw new CHttpException(400, 'No invoice lines found to calculate totals, so invoice is empty.');
-        }
-
-
+	
         $totalNet = 0;
         $totalVat = 0;
         $totalPp = 0;
         $totalGross = 0;
 
         foreach($lines as $line) {
-            $this->total_net += $line->line_net;
-            $this->total_vat += $line->line_vat;
-            $this->total_pp += $line->line_pp;
-            $this->total_gross += $line->line_gross;
+            $totalNet += (float)$line->line_net;
+            $totalVat += (float)$line->line_vat;
+            $totalPp += (float)$line->line_pp;
+            $totalGross += (float)$line->line_gross;
         }
+
+        $this->total_net = $totalNet;
+        $this->total_vat = $totalVat;
+        $this->total_pp = $totalPp;
+        $this->total_gross = $totalGross;
     }
 
 	/**
@@ -96,46 +101,47 @@ class Invoice extends CActiveRecord
 		$transaction = Yii::app()->db->beginTransaction();
 
 		try {
-			if($this->save()) { // Here we save the invoice itself, and exec beforeSave in model
+			// Handle invoice lines if provided
+			if(!isset($_POST['InvoiceLine']) || !is_array($_POST['InvoiceLine']) || count($_POST['InvoiceLine']) != 2)
+				throw new Exception('Invalid invoice line data');
+
+			// First, delete existing lines for update scenarios
+			InvoiceLine::model()->deleteAllByAttributes(['invoice_id' => $this->id]);
+
+			do {
+				$item_id = array_shift($_POST['InvoiceLine']['item_id']);
+				$quantity = array_shift($_POST['InvoiceLine']['quantity']);
 				
-				// Handle invoice lines if provided
-				if(isset($_POST['InvoiceLine']) && is_array($_POST['InvoiceLine']) && count($_POST['InvoiceLine']) == 2) {
+				if( empty($item_id) || empty($quantity) ) break;
 
-					// First, delete existing lines for update scenarios
-					InvoiceLine::model()->deleteAllByAttributes(['invoice_id' => $this->id]);
+				// Get item details to populate line data, we want Items from our DB not user input
+				$item = Item::model()->findByPk($item_id);
+			
+				$line = new InvoiceLine();
+				$line->invoice_id = $this->id;
+				$line->item_id = $item_id;
+				$line->quantity = $quantity;
 
-					do {
-						$item_id = array_shift($_POST['InvoiceLine']['item_id']);
-						$quantity = array_shift($_POST['InvoiceLine']['quantity']);
-						
-						if( empty($item_id) || empty($quantity) ) continue;
+				$line->unit_price = $item->price;
+				$line->vat_percent = $item->vat_percent;
+				$line->pp_percent = $item->pp_percent;
+				$line->line_name = $item->name;
 
-						// Get item details to populate line data
-						$item = Item::model()->findByPk($item_id);
-					
-						$line = new InvoiceLine();
-						$line->invoice_id = $this->id;
-						$line->item_id = $item_id;
-						$line->quantity = $quantity;
+				if(!$line->save()) 
+					throw new Exception('Failed to save invoice line');
 
-						$line->unit_price = $item->price;
-						$line->vat_percent = $item->vat_percent;
-						$line->pp_percent = $item->pp_percent;
-						$line->line_name = $item->name;
-
-						if(!$line->save()) 
-							throw new Exception('Failed to save invoice line');
-
-					}
-					while (!empty($_POST['InvoiceLine']['item_id']) || !empty($_POST['InvoiceLine']['quantity']));
-				}
-
-                $this->updateTotals();
-				
-				$transaction->commit();
-			} else {
-				$transaction->rollback();
 			}
+			while (!empty($_POST['InvoiceLine']['item_id']) || !empty($_POST['InvoiceLine']['quantity']));
+
+			$this->updateTotals();
+
+			if(!$this->save()) {
+				$transaction->rollback();
+				throw new Exception('Failed to save invoice');
+			}
+
+			$transaction->commit();
+
 		} catch(Exception $e) {
 			$transaction->rollback();
 			Yii::app()->user->setFlash('error', 'Error creating iiinvoice: ' . $e->getMessage());
