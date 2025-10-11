@@ -35,8 +35,4 @@ $invoiceLines = InvoiceLine::model()->findAllByAttributes(['invoice_id'=>$model-
 
 <h1>Update Invoice <?php echo $model->id; ?></h1>
 
-<?php $this->renderPartial('_existing_inv_lines', array('invoiceLines'=>$invoiceLines)); ?>
-
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
-
-<?php $this->renderPartial('_invoice_line', array('model'=>$model, 'items'=>$items)); ?>
+<?php $this->renderPartial('_form', array('model'=>$model, 'invoiceLines'=>$invoiceLines, 'items'=>$items)); ?>
