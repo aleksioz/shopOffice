@@ -9,8 +9,8 @@
 		<div style="flex: 2;">
 			<label>Item:</label>
 			<?php echo CHtml::dropDownList('InvoiceLine[item_id][]', '', 
-				CHtml::listData($items, 'id', 'name'), 
-				array('empty' => 'Select Item...', 'class' => 'item-select')
+				[], 
+				array('empty' => 'Select Item...', 'class' => 'item-select', 'style' => 'width: 200px;')
 			); ?>
 		</div>
 		<div style="flex: 1;">

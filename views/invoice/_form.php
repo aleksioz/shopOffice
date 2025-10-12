@@ -156,60 +156,70 @@ function deleteItem(id, status='draft') {
 <?php endif; ?>
 
 
-<?php 
-	// Hidden line template, used for adding new lines dynamically, by js below
-	$this->renderPartial('_invoice_line', array('model'=>$model, 'items'=>$items)); 
+<?php
+	$this->renderPartial('_invoice_line', array('items' => isset($items) ? $items : []));
 ?>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
 
-    var itemsData = {
-        <?php foreach($items as $item): ?>
-        <?php echo $item->id; ?>: {
-            name: '<?php echo addslashes($item->name); ?>',
-            price: <?php echo $item->price; ?>,
-            vat_percent: <?php echo $item->vat_percent; ?>,
-            pp_percent: <?php echo $item->pp_percent; ?>
-        },
-        <?php endforeach; ?>
-    };
-    
-    // Add new line
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function initializeSelect2(element) {
+        $(element).select2({
+            ajax: {
+                url: '<?php echo $this->createUrl("/shopOffice/item/list"); ?>',
+                dataType: 'json',
+                delay: 350,
+                data: function (params) {
+                    return {
+                        search: params.term // search term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search for an item',
+            minimumInputLength: 3,
+        });
+    }
+
     $('#add-line-btn').click(function() {
-        let template = $('#line-template').html();
-		template = template.replace(/invoice-line-hidden/g, 'invoice-line');
-        $('#invoice-lines').append(template);
-        attachLineEvents();
+        const template = $('#line-template').html();
+        const newRow = template.replace(/invoice-line-hidden/g, 'invoice-line').replace(/\[\]/g, '[]');
+        $('#invoice-lines').append(newRow);
+
+        const newSelect = $('#invoice-lines .invoice-line:last .item-select');
+        initializeSelect2(newSelect);
     });
-    
-    // Remove line
+
     $(document).on('click', '.remove-line-btn', function() {
-        $(this).closest('.invoice-line').remove();
-        calculateTotals();
+        $(this).closest('.invoice-line, .invoice-line-hidden').remove();
     });
-    
-    // Item selection change
-    $(document).on('change', '.item-select', function() {
-        const itemId = $(this).val();
-        const line = $(this).closest('.invoice-line');
-        
-        if (itemId && itemsData[itemId]) {
-            const item = itemsData[itemId];
+
+    // Initialize Select2 for existing lines
+    // $('.invoice-line select').each(function() {
+    //     initializeSelect2(this);
+    // });
+
+	// Item selection change
+    $(document).on('select2:select', '.item-select', function (e) {
+		const line = $(this).closest('.invoice-line');
+		const item = e.params.data;
+		console.log('line:', line);	
+
+        if (item) {
             line.find('.unit-price-input').val(parseFloat(item.price).toFixed(4));
             line.find('.vat-percent-input').val(parseFloat(item.vat_percent).toFixed(4));
             line.find('.pp-percent-input').val(parseFloat(item.pp_percent).toFixed(4));
-        } else {
-            line.find('.unit-price-input').val(0);
-            line.find('.vat-percent-input').val(0);
-            line.find('.pp-percent-input').val(0);
+			calculateLineTotal(line);
         }
-        calculateLineTotal(line);
     });
     
     // Quantity change
     $(document).on('input', '.quantity-input', function() {
-        var line = $(this).closest('.invoice-line');
+        const line = $(this).closest('.invoice-line');
         calculateLineTotal(line);
     });
     
@@ -267,12 +277,5 @@ $(document).ready(function() {
         $('#Invoice_total_pp').val(totalPp.toFixed(4));
         $('#Invoice_total_gross').val(totalGross.toFixed(4));
     }
-    
-    function attachLineEvents() {
-        // Re-attach events to newly added elements if needed
-    }
-    
-    // Add first line by default
-    // $('#add-line-btn').click();
 });
 </script>

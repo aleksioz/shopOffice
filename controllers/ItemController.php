@@ -28,7 +28,7 @@ class ItemController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view', 'list'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -138,6 +138,27 @@ class ItemController extends Controller
 		$this->render('admin',array(
 			'model'=>$model,
 		));
+	}
+
+	public function actionList($search)
+	{
+		$criteria = new CDbCriteria();
+		$criteria->addSearchCondition('name', $search);
+		$criteria->limit = 20;
+		$items = Item::model()->findAll($criteria);
+		$result = [];
+		foreach ($items as $item) {
+			$result[] = [
+				'id' => $item->id,
+				'text' => $item->name,
+				'unit' => $item->unit,
+				'price' => $item->price,
+				'vat_percent' => $item->vat_percent,
+				'pp_percent' => $item->pp_percent
+			];
+		}
+		echo CJSON::encode($result);
+		Yii::app()->end();
 	}
 
 	/**

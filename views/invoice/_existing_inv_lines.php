@@ -14,7 +14,7 @@
             </div>
             <div style="flex: 1;">
                 <label>Quantity:</label>
-                <input type="number" style="width:60px" name="InvoiceLine[quantity][]" class="quantity-input" value="<?= $line->quantity ?>" />
+                <input type="number" readonly style="width:60px" name="InvoiceLine[quantity][]" class="quantity-input" value="<?= $line->quantity ?>" />
             </div>
             <div style="flex: 1;">
                 <label>Unit Price:</label>
