@@ -196,12 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     $(document).on('click', '.remove-line-btn', function() {
         $(this).closest('.invoice-line, .invoice-line-hidden').remove();
+		calculateTotals();
     });
-
-    // Initialize Select2 for existing lines
-    // $('.invoice-line select').each(function() {
-    //     initializeSelect2(this);
-    // });
 
 	// Item selection change
     $(document).on('select2:select', '.item-select', function (e) {
