@@ -99,7 +99,7 @@ shopOffice/
 │   └── Item.php                 # Model artikla
 ├── views/                       # View fajlovi organizovani po kontrolerima
 └── migrations/                  # Migracije baze podataka
-└── tests/                       # Definisani testovi (global - modern - phpunit)
+└── tests/                       # Definisani testovi (global - modern - phpunit), COMMAND: phpunit --bootstrap bootstrap.php ItemTest.php
 ```
 
 ### Ključne projektne odluke
