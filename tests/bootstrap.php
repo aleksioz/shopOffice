@@ -3,7 +3,19 @@
 $yii = '/var/www/html/yii/framework/yii.php';
 
 // Path to your app config
-$config = require(dirname(__FILE__) . '/../../../config/main.php');
+$config = dirname(__FILE__) . '/../../../config/main.php';
+
+$config = require($config);
+$config['components']['assetManager'] = [
+        'basePath' => dirname(__FILE__) . '/assets',
+        'baseUrl' => '/assets',
+];
+// var_dump($config);
+
+
+
+
+
 // $config['components']['db'] = [
 // 	'connectionString' => 'sqlite::memory:',
 // 	'username' => '',
@@ -23,6 +35,6 @@ Yii::createWebApplication($config);
 Yii::app()->getModule('shopOffice');
 
 // 6. Optional performance tweaks
-Yii::app()->setComponent('log', null);
+// Yii::app()->setComponent('log', null);
 
 // Done — no old PHPUnit integration, no Yii test classes
