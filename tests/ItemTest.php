@@ -17,17 +17,17 @@ class ItemTest extends TestCase
         // make save() return true without touching DB
         $item->method('save')->willReturn(true);
 
-
 		// Create a new Item 
-		$item = new Item();
-		$item->name = 'Test Item';
-		$item->sku = 'TESTSKU1';
-		$item->unit = 'pcs';
-		$item->price = 50.00;
-		$item->vat_percent = 20.00;
-		$item->pp_percent = 5.00;
-		$item->created_at = new CDbExpression("NOW()");
-		$item->updated_at = new CDbExpression("NOW()");
+		$item->setAttributes([
+			'name' => 'Test Item',
+			'sku' => 'TESTSKU1',
+			'unit' => 'pcs',
+			'price' => 50.00,
+			'vat_percent' => 20.00,
+			'pp_percent' => 5.00,
+			'created_at' => new CDbExpression("NOW()"),
+			'updated_at' => new CDbExpression("NOW()"),
+		]);
 
 		$this->assertTrue($item->save(), 'Failed to save Item');
     }
