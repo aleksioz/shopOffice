@@ -4,12 +4,12 @@ $yii = '/var/www/html/yii/framework/yii.php';
 
 // Path to your app config
 $config = require(dirname(__FILE__) . '/../../../config/main.php');
-$config['components']['db'] = [
-	'connectionString' => 'sqlite::memory:',
-	'username' => '',
-	'password' => '',
-	'charset' => 'utf8',
-];
+// $config['components']['db'] = [
+// 	'connectionString' => 'sqlite::memory:',
+// 	'username' => '',
+// 	'password' => '',
+// 	'charset' => 'utf8',
+// ];
 
 // --------------------------------------------------
 // bootstrap.php — for modern PHPUnit + Yii 1.1
